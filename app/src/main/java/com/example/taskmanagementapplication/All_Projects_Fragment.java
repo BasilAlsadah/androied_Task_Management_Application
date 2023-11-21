@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,11 +56,31 @@ public class All_Projects_Fragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    //Here
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_all_projects, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_all_projects, container, false);
+        //find the create project button
+        Button create_project_btn = rootView.findViewById(R.id.add_project_btn);
+        //create on click listener
+        create_project_btn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                //create dialog
+                openMydialofg();
+
+            }
+
+        });
+
+
+        return rootView;
+    }
+    public void openMydialofg(){
+        myDialog mydialog=new myDialog();
+        mydialog.show(getActivity().getSupportFragmentManager(), "Create project page");
+
     }
 }
