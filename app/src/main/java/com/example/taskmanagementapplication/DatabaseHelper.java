@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //creating users table by ahmed
     private static final String DATABASE_NAME = "Mydata.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String TABLE_NAME = "users_table";
     private static final String COLUMN_USERNAME = "username";
     private static final String COLUMN_PASSWORD = "password";
@@ -76,10 +76,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //here will be project table methods by basil (not complete)
     private void createProjectsTable(SQLiteDatabase db){
         String create_project_table_sql="CREATE TABLE projects("+
-                "id INTEGER PRIMARY KEY,"+
+                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
                 "name TEXT,"+
                 "description TEXT,"+
-                "FOREIGN KEY (admin) REFERENCES users_table(username))";
+                "admin TEXT)";
         db.execSQL(create_project_table_sql);
     }
     //---------------insert new project

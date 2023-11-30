@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 public class myDialog extends AppCompatDialogFragment {
     EditText proj_name , proj_desc;
+    DatabaseHelper myHelper;
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -40,8 +42,8 @@ public class myDialog extends AppCompatDialogFragment {
                         String projectName = proj_name.getText().toString();
                         String projectDescription = proj_desc.getText().toString();
                         String proj_admin = activity.getUsername();
-
-                        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+                        Log.d("name:", String.valueOf(proj_name));
+                        myHelper = new DatabaseHelper(getActivity());
                         boolean isInserted = myHelper.insertProject(projectName, projectDescription,
                                 proj_admin);
 

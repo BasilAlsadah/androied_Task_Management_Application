@@ -17,7 +17,7 @@ public class Login_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //databaseHelper = new DatabaseHelper(this);
+        databaseHelper = new DatabaseHelper(this);
         Button loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,7 +32,6 @@ public class Login_Activity extends AppCompatActivity {
                 if(username.isEmpty() || password.isEmpty()){
                     Toast.makeText(Login_Activity.this,"Please fill all fields",Toast.LENGTH_LONG).show();
                 }
-                /*
                 if (databaseHelper.checkCredentials(username, password)) {
                     // Display success message or navigate to the next screen
                     Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_LONG).show();
@@ -45,7 +44,6 @@ public class Login_Activity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }
 
-                 */
             }
         });
 
