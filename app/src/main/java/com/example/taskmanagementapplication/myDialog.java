@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +33,23 @@ public class myDialog extends AppCompatDialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         proj_name=view.findViewById(R.id.project_name_txt);
-                        proj_name=view.findViewById(R.id.project_desc_txt);
+                        proj_desc=view.findViewById(R.id.project_desc_txt);
+                        Home_Activity activity = (Home_Activity) getActivity();
+
+
+                        String projectName = proj_name.getText().toString();
+                        String projectDescription = proj_desc.getText().toString();
+                        String proj_admin = activity.getUsername();
+
+                        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+                        boolean isInserted = myHelper.insertProject(projectName, projectDescription,
+                                proj_admin);
+
+                        if (isInserted) {
+                            Toast.makeText(getActivity(), "project inserted successfully.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getActivity(), "Failed to insert data.", Toast.LENGTH_LONG).show();
+                        }
 
                     }
                 });

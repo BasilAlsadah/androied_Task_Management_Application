@@ -97,7 +97,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view2" />
+            app:layout_constraintTop_toBottomOf="@+id/view2"
+            tools:listitem="@layout/custom_project_list_design" />
 
         <Button
             android:id="@+id/add_project_btn"

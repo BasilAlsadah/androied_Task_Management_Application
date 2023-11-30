@@ -49,7 +49,7 @@ public class Signup_Activity extends AppCompatActivity {
                 }
 
                 // Insert the username and password into the database
-                //  databaseHelper.insertUser(username, password);
+                databaseHelper.insertUser(username, password);
                 // Display success message
                 Toast.makeText(getApplicationContext(), "Sign up successful", Toast.LENGTH_SHORT).show();
 

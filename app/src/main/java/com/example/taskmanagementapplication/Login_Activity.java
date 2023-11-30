@@ -17,8 +17,7 @@ public class Login_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        databaseHelper = new DatabaseHelper(this);
-
+        //databaseHelper = new DatabaseHelper(this);
         Button loginButton = findViewById(R.id.loginButton);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,14 +29,23 @@ public class Login_Activity extends AppCompatActivity {
                 String password = passwordEditText.getText().toString();
 
                 // Check if the username and password match in the database
+                if(username.isEmpty() || password.isEmpty()){
+                    Toast.makeText(Login_Activity.this,"Please fill all fields",Toast.LENGTH_LONG).show();
+                }
+                /*
                 if (databaseHelper.checkCredentials(username, password)) {
                     // Display success message or navigate to the next screen
-                    Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_LONG).show();
                     // Add code to navigate to the next screen or perform any desired action
+                    Intent my_intent= new Intent(Login_Activity.this,Home_Activity.class);
+                    my_intent.putExtra("Log_in_username",username);
+                    startActivity(my_intent);
                 } else {
                     // Display error message for invalid credentials
                     Toast.makeText(getApplicationContext(), "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }
+
+                 */
             }
         });
 
