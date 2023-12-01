@@ -128,18 +128,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/description_field" />
 
-        <TextView
-            android:id="@+id/project_name_text"
-            android:layout_width="176dp"
-            android:layout_height="16dp"
-            android:text="Here will be the project name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.134"
-            app:layout_constraintStart_toEndOf="@+id/projectName_label"
-            app:layout_constraintTop_toBottomOf="@+id/view5"
-            app:layout_constraintVertical_bias="0.041" />
-
         <ListView
             android:id="@+id/project_tasks_list"
             android:layout_width="357dp"
@@ -228,6 +216,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/Remove_member_btn"
             app:layout_constraintVertical_bias="1.0" />
+
+        <EditText
+            android:id="@+id/project_name_text"
+            style="@style/Widget.Material3.AutoCompleteTextView.OutlinedBox.Dense"
+            android:layout_width="149dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:inputType="text"
+            android:text="Name"
+            app:layout_constraintBottom_toTopOf="@+id/description_field"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/projectName_label"
+            app:layout_constraintTop_toBottomOf="@+id/view5"
+            app:layout_constraintVertical_bias="0.266" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

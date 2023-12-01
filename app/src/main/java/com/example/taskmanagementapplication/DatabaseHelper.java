@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     //creating users table by ahmed
@@ -75,11 +77,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //---------------Create Project Table
     //here will be project table methods by basil (not complete)
     private void createProjectsTable(SQLiteDatabase db){
-        String create_project_table_sql="CREATE TABLE projects("+
-                "id INTEGER PRIMARY KEY AUTOINCREMENT,"+
-                "name TEXT,"+
-                "description TEXT,"+
-                "admin TEXT)";
+        String create_project_table_sql = "CREATE TABLE project (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "name TEXT, " +
+                "description TEXT," +
+                " admin TEXT)";
         db.execSQL(create_project_table_sql);
     }
     //---------------insert new project
@@ -97,6 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
     //---------------Retrieve all projects for a user
+    /*
     public ArrayList<String> getAll_projects(){
         ArrayList<String> projects_list=new ArrayList<>();
         db = this.getReadableDatabase();
@@ -111,6 +113,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         myCursor.close();
         return projects_list;
+    }
+
+     */
+    //new VERSION
+    public List<Pair<String, String>> getAllProjects() {
+        List<Pair<String, String>> projectsList = new ArrayList<>();
+        db = this.getReadableDatabase();
+        Cursor myCursor = db.rawQuery("SELECT * FROM projects", null);
+        if (myCursor.moveToFirst()) {
+            do {
+                String projectName = myCursor.getString(myCursor.getColumnIndexOrThrow("name"));
+                String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
+                Pair<String, String> project = new Pair<>(projectName, projectDesc);
+                projectsList.add(project);
+            } while (myCursor.moveToNext());
+        }
+        myCursor.close();
+        return projectsList;
+    }
+    //---------------Retrieve project description
+    public String getDescribtion(String proj_name){
+        db=this.getReadableDatabase();
+        String descriptionQuery = "SELECT description FROM projects WHERE name = ?";
+
+        // Execute the query and retrieve the description value
+        Cursor cursor = db.rawQuery(descriptionQuery, new String[]{proj_name});
+
+        String description="";
+        if (cursor.moveToFirst()) {
+            description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+        }
+
+        cursor.close();
+        return description;
     }
 
 }

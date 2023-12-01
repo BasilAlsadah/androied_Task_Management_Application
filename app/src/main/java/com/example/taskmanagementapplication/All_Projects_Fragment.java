@@ -7,9 +7,11 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +36,7 @@ public class All_Projects_Fragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    ArrayList<String> own=new ArrayList<String>();
 
     public All_Projects_Fragment() {
         // Required empty public constructor
@@ -78,16 +82,42 @@ public class All_Projects_Fragment extends Fragment {
         String current_user = activity.getUsername();
         username.setText("Welcome "+current_user);
 
+        own.add("item1");own.add("bro");own.add("Sekiro");
         //find project list
+        /*
         ListView projects_listview = rootView.findViewById(R.id.projects_list);
         DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-        /*
         ArrayList<String> All_projectList = myHelper.getAll_projects();
         ArrayAdapter<String> myAdapter = new ArrayAdapter<>(rootView.getContext(),
-                R.layout.custom_project_list_design,All_projectList);
+                android.R.layout.simple_expandable_list_item_2,All_projectList);
         projects_listview.setAdapter(myAdapter);
 
+
          */
+        //new VERSION
+        ListView projects_listview = rootView.findViewById(R.id.projects_list);
+        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+        List<Pair<String, String>> projectsList = myHelper.getAllProjects();
+        listAdapter adapter = new listAdapter(getActivity(), projectsList);
+        projects_listview.setAdapter(adapter);
+
+        //now i want to create an item click listener
+        projects_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the name of the clicked project
+                Pair<String, String> clickedProject = projectsList.get(position);
+                String clicked = clickedProject.first;
+                //create intent
+                Intent my_intent = new Intent(getActivity(),Project_Detail_Activity.class);
+                //put extra
+                my_intent.putExtra("current_user",current_user);
+                my_intent.putExtra("project_clicked",clicked);
+                //Start Activity
+                startActivity(my_intent);
+            }
+        });
+
         //create on click listener
         create_project_btn.setOnClickListener(new View.OnClickListener(){
             @Override
