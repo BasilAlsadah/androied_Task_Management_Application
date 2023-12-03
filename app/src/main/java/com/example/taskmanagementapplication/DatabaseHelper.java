@@ -13,7 +13,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     //creating users table by ahmed
     private static final String DATABASE_NAME = "Mydata.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String TABLE_NAME = "users_table";
     private static final String COLUMN_USERNAME = "username";
     private static final String COLUMN_PASSWORD = "password";
@@ -32,6 +32,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createTableQuery);
         //create projects table
         createProjectsTable(db);
+        //create members tale
+        createMembersTable(db);
+        //create tasks table
+        createTasksTable(db);
     }
 
     @Override
@@ -39,6 +43,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String dropTableQuery = "DROP TABLE IF EXISTS " + TABLE_NAME;
         db.execSQL(dropTableQuery);
         db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS Tasks");
+        onCreate(db);
+    }
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion){
+        String dropTableQuery = "DROP TABLE IF EXISTS " + TABLE_NAME;
+        db.execSQL(dropTableQuery);
+        db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS Tasks");
         onCreate(db);
     }
     //---------------Check for duplicate username
@@ -74,10 +89,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return isValid;
     }
+    //---------------Check if table is exist
+    public boolean isTableExists(String tableName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'", null);
+        if(cursor!=null) {
+            if(cursor.getCount()>0) {
+                cursor.close();
+                return true;
+            }
+            cursor.close();
+        }
+        return false;
+    }
     //---------------Create Project Table
-    //here will be project table methods by basil (not complete)
-    private void createProjectsTable(SQLiteDatabase db){
-        String create_project_table_sql = "CREATE TABLE project (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+    //here will be project table methods by basil
+    public void createProjectsTable(SQLiteDatabase db){
+        String create_project_table_sql = "CREATE TABLE IF NOT EXISTS projects (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT, " +
                 "description TEXT," +
                 " admin TEXT)";
@@ -97,7 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else
             return true;
     }
-    //---------------Retrieve all projects for a user
+    //---------------Retrieve all projects for a user *BROKEN*
     /*
     public ArrayList<String> getAll_projects(){
         ArrayList<String> projects_list=new ArrayList<>();
@@ -117,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
      */
     //new VERSION
+    /*
     public List<Pair<String, String>> getAllProjects() {
         List<Pair<String, String>> projectsList = new ArrayList<>();
         db = this.getReadableDatabase();
@@ -127,6 +156,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
                 Pair<String, String> project = new Pair<>(projectName, projectDesc);
                 projectsList.add(project);
+            } while (myCursor.moveToNext());
+        }
+        myCursor.close();
+        return projectsList;
+    }*/
+    //Another version
+    public List<Pair<Integer, Pair<String, String>>> getAllProjects() {
+        List<Pair<Integer, Pair<String, String>>> projectsList = new ArrayList<>();
+        db = this.getReadableDatabase();
+        Cursor myCursor = db.rawQuery("SELECT * FROM projects", null);
+        if (myCursor.moveToFirst()) {
+            do {
+                int projectId = myCursor.getInt(myCursor.getColumnIndexOrThrow("ID"));
+                String projectName = myCursor.getString(myCursor.getColumnIndexOrThrow("name"));
+                String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
+                Pair<String, String> project = new Pair<>(projectName, projectDesc);
+                projectsList.add(new Pair<>(projectId, project));
             } while (myCursor.moveToNext());
         }
         myCursor.close();
@@ -147,6 +193,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return description;
+    }
+    //---------------Create Tasks Table
+    //here will be Tasks table methods by basil
+    public void createTasksTable(SQLiteDatabase db){
+        String create_tasks_table_sql = "CREATE TABLE Tasks (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "project_id INTEGER, " +
+                "username TEXT," +
+                "title TEXT," +
+                "due_date TEXT,"+
+                "priority TEXT)";
+        db.execSQL(create_tasks_table_sql);
+    }
+
+
+
+    //---------------Create project_members Table
+    //here will be project_members table methods by basil
+    public void createMembersTable(SQLiteDatabase db){
+        String create_members_table_sql = "CREATE TABLE Members (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "project_id INTEGER, " +
+                "username TEXT)";
+        db.execSQL(create_members_table_sql);
+    }
+
+    //---------------Add new member to a project
+    public boolean insertMember(String username,int project_id){
+        db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("project_id",project_id);
+        contentValues.put("username",username);
+        long result=db.insert("Members",null,contentValues);
+        if(result == -1)
+            return false;
+        else
+            return true;
     }
 
 }

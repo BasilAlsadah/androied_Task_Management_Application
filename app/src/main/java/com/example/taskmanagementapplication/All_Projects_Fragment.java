@@ -81,6 +81,7 @@ public class All_Projects_Fragment extends Fragment {
         Home_Activity activity = (Home_Activity) getActivity();
         String current_user = activity.getUsername();
         username.setText("Welcome "+current_user);
+        DatabaseHelper my_helper = new DatabaseHelper(getActivity());
 
         own.add("item1");own.add("bro");own.add("Sekiro");
         //find project list
@@ -95,29 +96,35 @@ public class All_Projects_Fragment extends Fragment {
 
          */
         //new VERSION
-        ListView projects_listview = rootView.findViewById(R.id.projects_list);
-        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-        List<Pair<String, String>> projectsList = myHelper.getAllProjects();
-        listAdapter adapter = new listAdapter(getActivity(), projectsList);
-        projects_listview.setAdapter(adapter);
+        boolean is_exist = my_helper.isTableExists("projects");
+        if(is_exist) {
+            ListView projects_listview = rootView.findViewById(R.id.projects_list);
+            DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+            List<Pair<Integer, Pair<String, String>>> projectsList = myHelper.getAllProjects();
+            listAdapter adapter = new listAdapter(getActivity(), projectsList);
+            projects_listview.setAdapter(adapter);
 
-        //now i want to create an item click listener
-        projects_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the name of the clicked project
-                Pair<String, String> clickedProject = projectsList.get(position);
-                String clicked = clickedProject.first;
-                //create intent
-                Intent my_intent = new Intent(getActivity(),Project_Detail_Activity.class);
-                //put extra
-                my_intent.putExtra("current_user",current_user);
-                my_intent.putExtra("project_clicked",clicked);
-                //Start Activity
-                startActivity(my_intent);
-            }
-        });
+            //now i want to create an item click listener
+            projects_listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // Get the ID and name of the clicked project
+                    Pair<Integer, Pair<String, String>> clickedProject = projectsList.get(position);
+                    int projectId = clickedProject.first;
+                    String projectName = clickedProject.second.first;
+                    //create intent
+                    Intent my_intent = new Intent(getActivity(), Project_Detail_Activity.class);
+                    //put extra
+                    my_intent.putExtra("current_user", current_user);
+                    my_intent.putExtra("project_id", projectId);
+                    my_intent.putExtra("project_clicked", projectName);
+                    //Start Activity
+                    startActivity(my_intent);
+                }
+            });
+        }else{
 
+        }
         //create on click listener
         create_project_btn.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -137,4 +144,5 @@ public class All_Projects_Fragment extends Fragment {
         mydialog.show(getActivity().getSupportFragmentManager(), "Create project page");
 
     }
+
 }
