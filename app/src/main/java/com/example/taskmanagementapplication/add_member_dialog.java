@@ -16,6 +16,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class add_member_dialog extends AppCompatDialogFragment {
+    // Define the interface for the dialog dismiss listener
+    public interface DialogDismissListener {
+        void onDialogDismissed();
+    }
 
     @NonNull
     DatabaseHelper my_Helper;
@@ -50,9 +54,13 @@ public class add_member_dialog extends AppCompatDialogFragment {
                         } else {
                             Toast.makeText(getActivity(), "Failed to insert Member.", Toast.LENGTH_LONG).show();
                         }
-
+                        // Trigger the dialog dismiss listener
+                        if (getActivity() instanceof DialogDismissListener) {
+                            ((DialogDismissListener) getActivity()).onDialogDismissed();
+                        }
                     }
                 });
         return myBuilder.create();
     }
+
 }

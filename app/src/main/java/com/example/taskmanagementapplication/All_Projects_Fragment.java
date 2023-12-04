@@ -1,24 +1,18 @@
 package com.example.taskmanagementapplication;
 
-import static android.content.Intent.getIntent;
-
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +67,7 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
     //Here will start our code
     List<Pair<Integer, Pair<String, String>>> projectsList;
     DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-    listAdapter adapter;
+    project_listAdapter adapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -106,7 +100,7 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
             ListView projects_listview = rootView.findViewById(R.id.projects_list);
             DatabaseHelper myHelper = new DatabaseHelper(getActivity());
             List<Pair<Integer, Pair<String, String>>> projectsList = myHelper.getAllProjects(current_user);
-            adapter = new listAdapter(getActivity(), projectsList);
+            adapter = new project_listAdapter(getActivity(), projectsList);
             projects_listview.setAdapter(adapter);
 
             //now i want to create an item click listener

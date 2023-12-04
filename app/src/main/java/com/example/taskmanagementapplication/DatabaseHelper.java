@@ -131,7 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Pair<Integer, Pair<String, String>>> getAllProjects(String current_username) {
         List<Pair<Integer, Pair<String, String>>> projectsList = new ArrayList<>();
         db = this.getReadableDatabase();
-        Cursor myCursor = db.rawQuery("SELECT * FROM projects JOIN Members ON "
+        Cursor myCursor = db.rawQuery("SELECT projects.* FROM projects JOIN Members ON "
                 +"projects.ID=Members.project_id "
                 +"WHERE Members.username= ?", new String[] {current_username});
         if (myCursor.moveToFirst()) {
@@ -210,6 +210,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return false;
         else
             return true;
+    }
+    //a method that will return an array containing all members in particular project
+    public ArrayList<String> member_array(int project_id){
+        ArrayList<String> membersList = new ArrayList<>();
+        db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT username FROM Members WHERE project_id=?", new String[] {String.valueOf(project_id)});
+        if (cursor.moveToFirst()) {
+            do {
+                String username = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                membersList.add(username);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return membersList;
     }
 
 }

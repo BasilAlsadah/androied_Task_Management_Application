@@ -5,12 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
-public class Project_Detail_Activity extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class Project_Detail_Activity extends AppCompatActivity implements add_member_dialog.DialogDismissListener{
     int current_project_id;
+    ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,11 +38,19 @@ public class Project_Detail_Activity extends AppCompatActivity {
         String get_description = my_helper.getDescribtion(project_clicked);
         proj_desc.setText(get_description);
 
+        //now i want to print all members in the project
+        ListView members_listView = findViewById(R.id.projectMembers_list);
+        ArrayList<String> members_array = my_helper.member_array(current_project_id);
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,members_array);
+        members_listView.setAdapter(adapter);
+
 
         //add member function
         add_member.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 open_addMember_Dialog();
             }
         });
@@ -50,6 +63,23 @@ public class Project_Detail_Activity extends AppCompatActivity {
     }
     //a method to get current project id to help adding new members
     public int get_projectId(){
+
         return current_project_id;
     }
+    // Implement the DialogDismissListener interface
+    @Override
+    public void onDialogDismissed() {
+        // Dialog has been dismissed, update the member list
+        updateMemberList();
+    }
+
+    // Method to update the member list
+    private void updateMemberList() {
+        DatabaseHelper my_helper = new DatabaseHelper(this);
+        ArrayList<String> members_array = my_helper.member_array(current_project_id);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, members_array);
+        ListView members_listView = findViewById(R.id.projectMembers_list);
+        members_listView.setAdapter(adapter);
+    }
+
 }

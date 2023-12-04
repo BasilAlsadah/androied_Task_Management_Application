@@ -8,15 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class listAdapter extends ArrayAdapter<Pair<Integer, Pair<String, String>>> {
+public class project_listAdapter extends ArrayAdapter<Pair<Integer, Pair<String, String>>> {
 
-    public listAdapter(Context context, List<Pair<Integer, Pair<String, String>>> projects) {
+    public project_listAdapter(Context context, List<Pair<Integer, Pair<String, String>>> projects) {
         super(context, R.layout.custom_project_list_design, projects);
     }
 
