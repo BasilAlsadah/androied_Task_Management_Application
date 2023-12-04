@@ -18,7 +18,7 @@ import android.widget.Toast;
 public class add_member_dialog extends AppCompatDialogFragment {
 
     @NonNull
-    DatabaseHelper my_Helper = new DatabaseHelper(getActivity());
+    DatabaseHelper my_Helper;
     EditText username_editText;
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -38,9 +38,13 @@ public class add_member_dialog extends AppCompatDialogFragment {
                         username_editText=view.findViewById(R.id.username_plainText);
                         Project_Detail_Activity activity = (Project_Detail_Activity) getActivity();
                         String get_username=username_editText.getText().toString();
+                        //because admin can not add himself
+                        String is_admin="no";
+
+                        my_Helper = new DatabaseHelper(getActivity());
 
                         int project_id=activity.get_projectId();
-                        boolean isInserted=my_Helper.insertMember(get_username,project_id);
+                        boolean isInserted=my_Helper.insertMember(get_username,project_id,is_admin);
                         if (isInserted) {
                             Toast.makeText(getActivity(), "Member inserted successfully.", Toast.LENGTH_LONG).show();
                         } else {

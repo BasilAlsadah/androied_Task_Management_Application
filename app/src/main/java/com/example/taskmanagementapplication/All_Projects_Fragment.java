@@ -2,11 +2,13 @@ package com.example.taskmanagementapplication;
 
 import static android.content.Intent.getIntent;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +28,7 @@ import java.util.List;
  * Use the {@link All_Projects_Fragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class All_Projects_Fragment extends Fragment {
+public class All_Projects_Fragment extends Fragment implements myDialog.OnDismissListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -69,6 +71,9 @@ public class All_Projects_Fragment extends Fragment {
         }
     }
     //Here will start our code
+    List<Pair<Integer, Pair<String, String>>> projectsList;
+    DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+    listAdapter adapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,8 +105,8 @@ public class All_Projects_Fragment extends Fragment {
         if(is_exist) {
             ListView projects_listview = rootView.findViewById(R.id.projects_list);
             DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-            List<Pair<Integer, Pair<String, String>>> projectsList = myHelper.getAllProjects();
-            listAdapter adapter = new listAdapter(getActivity(), projectsList);
+            List<Pair<Integer, Pair<String, String>>> projectsList = myHelper.getAllProjects(current_user);
+            adapter = new listAdapter(getActivity(), projectsList);
             projects_listview.setAdapter(adapter);
 
             //now i want to create an item click listener
@@ -139,10 +144,28 @@ public class All_Projects_Fragment extends Fragment {
 
         return rootView;
     }
+    @Override
+    public void onDialogDismiss() {
+            Home_Activity activity = (Home_Activity) getActivity();
+            String current_user = activity.getUsername();
+            //When the dialog dismissed we will update the listView
+            DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+            //get all projects
+            List<Pair<Integer, Pair<String, String>>> updatedProjectsList = myHelper.getAllProjects(current_user);
+
+            // Update the adapter with the new data
+            adapter.clear();
+            adapter.addAll(updatedProjectsList);
+
+            // Notify the adapter that the data has changed
+            adapter.notifyDataSetChanged();
+
+    }
+
     public void openMydialofg(){
         myDialog mydialog=new myDialog();
+        mydialog.setOnDismissListener((myDialog.OnDismissListener) this);
         mydialog.show(getActivity().getSupportFragmentManager(), "Create project page");
-
     }
 
 }

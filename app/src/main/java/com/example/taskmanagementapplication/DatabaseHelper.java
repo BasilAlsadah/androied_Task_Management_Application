@@ -126,46 +126,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
     //---------------Retrieve all projects for a user *BROKEN*
-    /*
-    public ArrayList<String> getAll_projects(){
-        ArrayList<String> projects_list=new ArrayList<>();
-        db = this.getReadableDatabase();
-        Cursor myCursor=db.rawQuery("SELECT * FROM projects",null);
-        if (myCursor.moveToFirst()) {
-            do {
-                String projectName = myCursor.getString(myCursor.getColumnIndexOrThrow("name"));
-                String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
-                projects_list.add(projectName);
-                projects_list.add(projectDesc);
-            } while (myCursor.moveToNext());
-        }
-        myCursor.close();
-        return projects_list;
-    }
 
-     */
-    //new VERSION
-    /*
-    public List<Pair<String, String>> getAllProjects() {
-        List<Pair<String, String>> projectsList = new ArrayList<>();
-        db = this.getReadableDatabase();
-        Cursor myCursor = db.rawQuery("SELECT * FROM projects", null);
-        if (myCursor.moveToFirst()) {
-            do {
-                String projectName = myCursor.getString(myCursor.getColumnIndexOrThrow("name"));
-                String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
-                Pair<String, String> project = new Pair<>(projectName, projectDesc);
-                projectsList.add(project);
-            } while (myCursor.moveToNext());
-        }
-        myCursor.close();
-        return projectsList;
-    }*/
     //Another version
-    public List<Pair<Integer, Pair<String, String>>> getAllProjects() {
+    public List<Pair<Integer, Pair<String, String>>> getAllProjects(String current_username) {
         List<Pair<Integer, Pair<String, String>>> projectsList = new ArrayList<>();
         db = this.getReadableDatabase();
-        Cursor myCursor = db.rawQuery("SELECT * FROM projects", null);
+        Cursor myCursor = db.rawQuery("SELECT * FROM projects JOIN Members ON "
+                +"projects.ID=Members.project_id "
+                +"WHERE Members.username= ?", new String[] {current_username});
         if (myCursor.moveToFirst()) {
             do {
                 int projectId = myCursor.getInt(myCursor.getColumnIndexOrThrow("ID"));
@@ -194,6 +162,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return description;
     }
+    //a method that we use to get the id of the last project that was inserted
+    public int getLastProject_Id(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT MAX(ID) FROM projects";
+        Cursor cursor = db.rawQuery(query, null);
+        int lastId = -1;
+        if (cursor.moveToFirst()) {
+            lastId = cursor.getInt(0);
+        }
+        cursor.close();
+        return lastId;
+    }
     //---------------Create Tasks Table
     //here will be Tasks table methods by basil
     public void createTasksTable(SQLiteDatabase db){
@@ -211,18 +191,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //---------------Create project_members Table
     //here will be project_members table methods by basil
     public void createMembersTable(SQLiteDatabase db){
-        String create_members_table_sql = "CREATE TABLE Members (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        String create_members_table_sql = "CREATE TABLE IF NOT EXISTS Members (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "project_id INTEGER, " +
+                "is_admin TEXT,"+
                 "username TEXT)";
         db.execSQL(create_members_table_sql);
     }
 
     //---------------Add new member to a project
-    public boolean insertMember(String username,int project_id){
+    public boolean insertMember(String username,int project_id,String is_admin){
         db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("project_id",project_id);
         contentValues.put("username",username);
+        contentValues.put("is_admin",is_admin);
         long result=db.insert("Members",null,contentValues);
         if(result == -1)
             return false;
