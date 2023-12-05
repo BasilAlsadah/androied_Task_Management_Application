@@ -204,9 +204,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "title TEXT," +
                 "due_date TEXT," +
                 "priority TEXT," +
+                "status Text ,"+
                 "FOREIGN KEY (project_id) REFERENCES projects(ID)," +
                 "FOREIGN KEY (username) REFERENCES users_table(username))";
         db.execSQL(create_tasks_table_sql);
+    }
+    //---------------insert a task
+    public boolean insertTask(int project_id, String username,String title,String due_date,
+                              String priority,String status){
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Check if the username and project_id exist in the members table
+        Cursor cursor = db.rawQuery("SELECT * FROM members WHERE username = ? AND project_id = ?",
+                new String[]{username, String.valueOf(project_id)});
+        boolean usernameIs_member = cursor.getCount() > 0;
+        cursor.close();
+
+        if (usernameIs_member) {
+            ContentValues values = new ContentValues();
+            values.put("project_id", project_id);
+            values.put("username", username);
+            values.put("title", title);
+            values.put("due_date", due_date);
+            values.put("priority", priority);
+            values.put("status", status);
+
+            long result = db.insert("tasks", null, values);
+            return result != -1;
+        }
+        else {
+            return false;
+        }
     }
 
 
@@ -236,7 +263,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
     }
 
-    //a method that will return an array containing all members in particular project
+    //---------------a method that will return an array containing all members in particular project
     public ArrayList<String> member_array(int project_id) {
         ArrayList<String> membersList = new ArrayList<>();
         db = this.getReadableDatabase();
@@ -251,7 +278,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return membersList;
     }
 
-    //a method that will remove a member from a project
+    //---------------a method that will remove a member from a project
     public boolean removeMember(int project_id, String username) {
         db = this.getWritableDatabase();
         try {

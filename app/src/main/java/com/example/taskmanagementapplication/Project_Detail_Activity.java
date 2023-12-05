@@ -28,6 +28,7 @@ public class Project_Detail_Activity extends AppCompatActivity implements add_me
         EditText proj_name = findViewById(R.id.project_name_text);
         EditText proj_desc = findViewById(R.id.description_field);
         Button add_member = findViewById(R.id.Add_member_btn);
+        Button add_task_btn = findViewById(R.id.Add_task_btn);
         current_project_id=getIntent().getIntExtra("project_id",0);
         String current_user=getIntent().getStringExtra("current_user");
         String project_clicked=getIntent().getStringExtra("project_clicked");
@@ -46,8 +47,15 @@ public class Project_Detail_Activity extends AppCompatActivity implements add_me
         adapter = new member_listAdapter(this,R.layout.member_list_adapter,members_array,this);
         members_listView.setAdapter(adapter);
 
+        //add task onClick function
+        add_task_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        //add member function
+                open_addTask_dialog();
+            }
+        });
+        //add member onClick function
         add_member.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +65,12 @@ public class Project_Detail_Activity extends AppCompatActivity implements add_me
         });
 
     }
-
+    //a method that will open addTask dialog
+    public void open_addTask_dialog(){
+        add_task_dialog taskDialog= new add_task_dialog();
+        taskDialog.show(getSupportFragmentManager(),"Create New Task");
+    }
+    //a method that will open addMember dialog
     public void open_addMember_Dialog(){
     add_member_dialog memberDialog = new add_member_dialog();
     memberDialog.show(getSupportFragmentManager(),"Add new member");
