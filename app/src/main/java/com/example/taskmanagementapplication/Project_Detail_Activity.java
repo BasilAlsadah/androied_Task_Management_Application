@@ -8,14 +8,16 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 public class Project_Detail_Activity extends AppCompatActivity implements add_member_dialog.DialogDismissListener{
     int current_project_id;
-    ArrayAdapter<String> adapter;
+    member_listAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +43,7 @@ public class Project_Detail_Activity extends AppCompatActivity implements add_me
         //now i want to print all members in the project
         ListView members_listView = findViewById(R.id.projectMembers_list);
         ArrayList<String> members_array = my_helper.member_array(current_project_id);
-        adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1,members_array);
+        adapter = new member_listAdapter(this,R.layout.member_list_adapter,members_array,this);
         members_listView.setAdapter(adapter);
 
 
@@ -76,8 +77,8 @@ public class Project_Detail_Activity extends AppCompatActivity implements add_me
     // Method to update the member list
     private void updateMemberList() {
         DatabaseHelper my_helper = new DatabaseHelper(this);
-        ArrayList<String> members_array = my_helper.member_array(current_project_id);
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, members_array);
+        ArrayList<String> updated_members_array = my_helper.member_array(current_project_id);
+        adapter = new member_listAdapter(this,R.layout.member_list_adapter, updated_members_array, this);
         ListView members_listView = findViewById(R.id.projectMembers_list);
         members_listView.setAdapter(adapter);
     }

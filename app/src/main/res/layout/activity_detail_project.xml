@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -194,27 +195,15 @@
             app:layout_constraintVertical_bias="0.179" />
 
         <Button
-            android:id="@+id/Remove_member_btn"
-            android:layout_width="97dp"
-            android:layout_height="39dp"
-            android:text="Rrmove"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.174"
-            app:layout_constraintStart_toEndOf="@+id/Add_member_btn"
-            app:layout_constraintTop_toBottomOf="@+id/projectMembers_list"
-            app:layout_constraintVertical_bias="0.145" />
-
-        <Button
             android:id="@+id/delete_project_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="Delete project"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Remove_member_btn"
+            app:layout_constraintTop_toBottomOf="@+id/Add_member_btn"
             app:layout_constraintVertical_bias="1.0" />
 
         <EditText

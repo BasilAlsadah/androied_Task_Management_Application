@@ -3,8 +3,10 @@ package com.example.taskmanagementapplication;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.util.Pair;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        //enable foreign key constraints
+        db.execSQL("PRAGMA foreign_keys=ON;");
         //create users table
         String createTableQuery = "CREATE TABLE " + TABLE_NAME + " ("
                 + COLUMN_USERNAME + " TEXT PRIMARY KEY,"
@@ -43,19 +47,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String dropTableQuery = "DROP TABLE IF EXISTS " + TABLE_NAME;
         db.execSQL(dropTableQuery);
         db.execSQL("DROP TABLE IF EXISTS projects");
-        db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS Members");
         db.execSQL("DROP TABLE IF EXISTS Tasks");
         onCreate(db);
     }
+
     @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion){
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         String dropTableQuery = "DROP TABLE IF EXISTS " + TABLE_NAME;
         db.execSQL(dropTableQuery);
         db.execSQL("DROP TABLE IF EXISTS projects");
-        db.execSQL("DROP TABLE IF EXISTS projects");
+        db.execSQL("DROP TABLE IF EXISTS Members");
         db.execSQL("DROP TABLE IF EXISTS Tasks");
         onCreate(db);
     }
+
+    //---------------to enable foreign key
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        db.execSQL("PRAGMA foreign_keys=ON;");
+        super.onOpen(db);
+    }
+
     //---------------Check for duplicate username
     public boolean usernameExists(String username) {
         db = this.getReadableDatabase();
@@ -65,6 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return exists;
     }
+
     //---------------Insert new User
     public void insertUser(String username, String password) {
         db = this.getWritableDatabase();
@@ -74,27 +88,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
         //db.close();
     }
+
     //---------------Check if user information is correct
     public boolean checkCredentials(String username, String password) {
         db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_USERNAME + " = ? AND " + COLUMN_PASSWORD + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{username, password});
         boolean isValid;
-        if(cursor.getCount() > 0){
-            isValid=true;
-        }
-        else{
-            isValid=false;
+        if (cursor.getCount() > 0) {
+            isValid = true;
+        } else {
+            isValid = false;
         }
         cursor.close();
         return isValid;
     }
+
     //---------------Check if table is exist
     public boolean isTableExists(String tableName) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select DISTINCT tbl_name from sqlite_master where tbl_name = '" + tableName + "'", null);
-        if(cursor!=null) {
-            if(cursor.getCount()>0) {
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
                 cursor.close();
                 return true;
             }
@@ -102,25 +117,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return false;
     }
+
     //---------------Create Project Table
     //here will be project table methods by basil
-    public void createProjectsTable(SQLiteDatabase db){
+    public void createProjectsTable(SQLiteDatabase db) {
         String create_project_table_sql = "CREATE TABLE IF NOT EXISTS projects (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "name TEXT, " +
                 "description TEXT," +
-                " admin TEXT)";
+                " admin TEXT," +
+                "FOREIGN KEY (admin) REFERENCES users_table(username))";
         db.execSQL(create_project_table_sql);
     }
+
     //---------------insert new project
-    // a method that will be used to inset a project
-    public boolean insertProject(String project_name,String project_description,String admin){
+    // a method that will be used to insert a project
+    public boolean insertProject(String project_name, String project_description, String admin) {
         db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("name",project_name);
-        contentValues.put("description",project_description);
-        contentValues.put("admin",admin);
-        long result=db.insert("projects",null,contentValues);
-        if(result == -1)
+        contentValues.put("name", project_name);
+        contentValues.put("description", project_description);
+        contentValues.put("admin", admin);
+        long result = db.insert("projects", null, contentValues);
+        if (result == -1)
             return false;
         else
             return true;
@@ -132,8 +150,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<Pair<Integer, Pair<String, String>>> projectsList = new ArrayList<>();
         db = this.getReadableDatabase();
         Cursor myCursor = db.rawQuery("SELECT projects.* FROM projects JOIN Members ON "
-                +"projects.ID=Members.project_id "
-                +"WHERE Members.username= ?", new String[] {current_username});
+                + "projects.ID=Members.project_id "
+                + "WHERE Members.username= ?", new String[]{current_username});
         if (myCursor.moveToFirst()) {
             do {
                 int projectId = myCursor.getInt(myCursor.getColumnIndexOrThrow("ID"));
@@ -146,15 +164,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         myCursor.close();
         return projectsList;
     }
+
     //---------------Retrieve project description
-    public String getDescribtion(String proj_name){
-        db=this.getReadableDatabase();
+    public String getDescribtion(String proj_name) {
+        db = this.getReadableDatabase();
         String descriptionQuery = "SELECT description FROM projects WHERE name = ?";
 
         // Execute the query and retrieve the description value
         Cursor cursor = db.rawQuery(descriptionQuery, new String[]{proj_name});
 
-        String description="";
+        String description = "";
         if (cursor.moveToFirst()) {
             description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
         }
@@ -162,8 +181,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return description;
     }
+
     //a method that we use to get the id of the last project that was inserted
-    public int getLastProject_Id(){
+    public int getLastProject_Id() {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT MAX(ID) FROM projects";
         Cursor cursor = db.rawQuery(query, null);
@@ -174,48 +194,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return lastId;
     }
+
     //---------------Create Tasks Table
     //here will be Tasks table methods by basil
-    public void createTasksTable(SQLiteDatabase db){
+    public void createTasksTable(SQLiteDatabase db) {
         String create_tasks_table_sql = "CREATE TABLE Tasks (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "project_id INTEGER, " +
                 "username TEXT," +
                 "title TEXT," +
-                "due_date TEXT,"+
-                "priority TEXT)";
+                "due_date TEXT," +
+                "priority TEXT," +
+                "FOREIGN KEY (project_id) REFERENCES projects(ID)," +
+                "FOREIGN KEY (username) REFERENCES users_table(username))";
         db.execSQL(create_tasks_table_sql);
     }
 
 
-
     //---------------Create project_members Table
     //here will be project_members table methods by basil
-    public void createMembersTable(SQLiteDatabase db){
+    public void createMembersTable(SQLiteDatabase db) {
         String create_members_table_sql = "CREATE TABLE IF NOT EXISTS Members (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "project_id INTEGER, " +
-                "is_admin TEXT,"+
-                "username TEXT)";
+                "is_admin TEXT," +
+                "username TEXT," +
+                "FOREIGN KEY (project_id) REFERENCES projects(ID)," +
+                "FOREIGN KEY (username) REFERENCES users_table(username))";
         db.execSQL(create_members_table_sql);
     }
 
     //---------------Add new member to a project
-    public boolean insertMember(String username,int project_id,String is_admin){
+    public boolean insertMember(String username, int project_id, String is_admin) {
         db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("project_id",project_id);
-        contentValues.put("username",username);
-        contentValues.put("is_admin",is_admin);
-        long result=db.insert("Members",null,contentValues);
-        if(result == -1)
+        contentValues.put("project_id", project_id);
+        contentValues.put("username", username);
+        contentValues.put("is_admin", is_admin);
+        long result = db.insert("Members", null, contentValues);
+        if (result == -1)
             return false;
         else
             return true;
     }
+
     //a method that will return an array containing all members in particular project
-    public ArrayList<String> member_array(int project_id){
+    public ArrayList<String> member_array(int project_id) {
         ArrayList<String> membersList = new ArrayList<>();
         db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT username FROM Members WHERE project_id=?", new String[] {String.valueOf(project_id)});
+        Cursor cursor = db.rawQuery("SELECT username FROM Members WHERE project_id=?", new String[]{String.valueOf(project_id)});
         if (cursor.moveToFirst()) {
             do {
                 String username = cursor.getString(cursor.getColumnIndexOrThrow("username"));
@@ -226,4 +251,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return membersList;
     }
 
+    //a method that will remove a member from a project
+    public boolean removeMember(int project_id, String username) {
+        db = this.getWritableDatabase();
+        try {
+            // Execute a SELECT query to check if is_admin is "yes"
+            Cursor cursor = db.rawQuery("SELECT is_admin FROM Members WHERE project_id=? AND username=?", new String[]{String.valueOf(project_id), String.valueOf(username)});
+            if (cursor.moveToFirst()) {
+                String is_admin = cursor.getString(cursor.getColumnIndexOrThrow("is_admin"));
+                // If the member is the admin of the project then you can not remove him
+                if (is_admin.equals("yes")) {
+                    return false;
+                }
+            }
+            // If is_admin is not "yes", execute the DELETE statement
+            db.execSQL("DELETE FROM Members WHERE project_id=? AND username=?", new String[]{String.valueOf(project_id), String.valueOf(username)});
+            return true;
+        } catch (SQLException e) {
+            Log.e("removeMember", "Failed to delete member", e);
+            return false;
+        }
+    }
 }
