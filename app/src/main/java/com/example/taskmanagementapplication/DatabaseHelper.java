@@ -204,7 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "title TEXT," +
                 "due_date TEXT," +
                 "priority TEXT," +
-                "status Text ,"+
+                "status TEXT ,"+
                 "FOREIGN KEY (project_id) REFERENCES projects(ID)," +
                 "FOREIGN KEY (username) REFERENCES users_table(username))";
         db.execSQL(create_tasks_table_sql);
@@ -214,7 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                               String priority,String status){
         SQLiteDatabase db = this.getWritableDatabase();
         // Check if the username and project_id exist in the members table
-        Cursor cursor = db.rawQuery("SELECT * FROM members WHERE username = ? AND project_id = ?",
+        Cursor cursor = db.rawQuery("SELECT * FROM Members WHERE username = ? AND project_id = ?",
                 new String[]{username, String.valueOf(project_id)});
         boolean usernameIs_member = cursor.getCount() > 0;
         cursor.close();
@@ -234,6 +234,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else {
             return false;
         }
+    }
+    //---------------retrieve task
+    public ArrayList<Task> project_tasks(int project_id){
+        ArrayList<Task> tasks_list = new ArrayList<>();
+        db=this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ID,username,title,due_date,priority,status FROM Tasks " +
+                "WHERE project_id=?",new String[]{String.valueOf(project_id)});
+        if (cursor.moveToFirst()){
+            do {
+                String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
+                String get_task_dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
+                String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                // Create a new Task object and add it to the list
+                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
+                tasks_list.add(task);
+            } while (cursor.moveToNext());
+        }
+        return  tasks_list;
     }
 
 

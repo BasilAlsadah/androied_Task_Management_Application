@@ -16,6 +16,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 public class add_task_dialog extends AppCompatDialogFragment {
+    public interface DialogDismissListener {
+        void onDialogDismissed();
+    }
     @NonNull
     EditText task_id,username_editText,task_title,task_dueDate;
     Spinner priority_spinner,status_spinner;
@@ -73,6 +76,10 @@ public class add_task_dialog extends AppCompatDialogFragment {
                     else{
                         Toast.makeText(getActivity(), "Adding Task Fail", Toast.LENGTH_LONG).show();
                     }
+                        // Trigger the dialog dismiss listener
+                        if (getActivity() instanceof add_task_dialog.DialogDismissListener) {
+                            ((add_task_dialog.DialogDismissListener) getActivity()).onDialogDismissed();
+                        }
                     }
                 });
         return builder.create();
