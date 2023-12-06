@@ -1,20 +1,30 @@
 package com.example.taskmanagementapplication;
 
+import static android.app.PendingIntent.getActivity;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Project_Detail_Activity extends AppCompatActivity implements add_member_dialog.DialogDismissListener,
 add_task_dialog.DialogDismissListener{
@@ -75,6 +85,101 @@ add_task_dialog.DialogDismissListener{
                 project_tasks_array,this);
         tasks_listView.setAdapter(tasksListAdapter);
 
+        //now i want to add an item on click listener to tasks listview
+        tasks_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Task clickedTask = (Task) tasksListAdapter.getItem(position);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(Project_Detail_Activity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.dialog_update_task, null);
+                builder.setView(dialogView);
+
+                // Get references to the input fields or UI elements inside the dialog
+                EditText usernameEditText = dialogView.findViewById(R.id.username_editText);
+                EditText titleEditText = dialogView.findViewById(R.id.task_title);
+                EditText due_dateEditText = dialogView.findViewById(R.id.task_due_date);
+                Spinner priority_spinner=dialogView.findViewById(R.id.priority_spinner);
+                Spinner status_spinner=dialogView.findViewById(R.id.status_spinner);
+                // now declare spinners
+                // Create a list of items for the spinner.
+                String[] priority_items = new String[]{"High", "Medium", "Low"};
+                String[] status_items = new String[]{"not started","in progress","Done"};
+                // Create an adapter to describe how the items are displayed.
+                ArrayAdapter<String> priority_adapter = new ArrayAdapter<>(Project_Detail_Activity.this,
+                        android.R.layout.simple_spinner_dropdown_item,
+                        priority_items);
+                //create another adapter for task status
+                ArrayAdapter<String> status_adapter = new ArrayAdapter<>(Project_Detail_Activity.this,
+                        android.R.layout.simple_spinner_dropdown_item,status_items);
+                //set adapters
+                priority_spinner.setAdapter(priority_adapter);
+                status_spinner.setAdapter(status_adapter);
+
+                // Set initial values for the input fields as it was set before
+                usernameEditText.setText(clickedTask.getAssigned_to());
+                titleEditText.setText(clickedTask.getTitle());
+                due_dateEditText.setText(clickedTask.getDueDate());
+
+                // Set spinner selections based on set values
+                String priority = clickedTask.getPriority();
+                String status = clickedTask.getStatus();
+
+                //check index of the selection
+                int priorityIndex = Arrays.asList(priority_items).indexOf(priority);
+                if (priorityIndex != -1) {
+                    priority_spinner.setSelection(priorityIndex);
+                }
+
+                int statusIndex = Arrays.asList(status_items).indexOf(status);
+                if (statusIndex != -1) {
+                    status_spinner.setSelection(statusIndex);
+                }
+
+                // Set listeners for buttons or other UI elements inside the dialog
+                builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Retrieve the updated values from the input fields
+                        String get_taskId=clickedTask.getId();
+                        int task_id_int=Integer.parseInt(get_taskId);
+                        String newUser = usernameEditText.getText().toString();
+                        String newTitle = titleEditText.getText().toString();
+                        String newDate = due_dateEditText.getText().toString();
+                        String new_priority=priority_spinner.getSelectedItem().toString();
+                        String new_status=status_spinner.getSelectedItem().toString();
+
+
+                        // Update the clickedTask object with the updated values
+                        clickedTask.setAssigned_to(newUser);
+                        clickedTask.setTitle(newTitle);
+                        clickedTask.setDueDate(newDate);
+                        clickedTask.setPriority(new_priority);
+                        clickedTask.setStatus(new_status);
+                        boolean updateTask = my_helper.updateTask(task_id_int,clickedTask.getTitle(),
+                                clickedTask.getAssigned_to(),clickedTask.getDueDate(),
+                                clickedTask.getPriority(),clickedTask.getStatus());
+                        if(updateTask){
+                            Toast.makeText(Project_Detail_Activity.this,
+                                    "Task Updated successfully.",Toast.LENGTH_LONG).show();
+                        }
+                        else{
+                            Toast.makeText(Project_Detail_Activity.this
+                                    , "Task Updated Fail!.",Toast.LENGTH_LONG).show();
+                        }
+
+                        // Notify the adapter that the data has changed
+                        tasksListAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", null);
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
 
         //now i want to print all members in the project
         ListView members_listView = findViewById(R.id.projectMembers_list);

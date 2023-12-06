@@ -256,7 +256,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         return  tasks_list;
     }
+    //---------------Update task
+    public boolean updateTask(int taskId, String newTitle,String newUsername, String newDueDate, String newPriority, String newStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        ContentValues values = new ContentValues();
+        values.put("title", newTitle);
+        values.put("username", newUsername);
+        values.put("due_date", newDueDate);
+        values.put("priority", newPriority);
+        values.put("status", newStatus);
+
+        int rowsAffected = db.update("Tasks", values, "ID=?", new String[]{String.valueOf(taskId)});
+        db.close();
+
+        return rowsAffected > 0;
+    }
 
     //---------------Create project_members Table
     //here will be project_members table methods by basil

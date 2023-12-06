@@ -2,6 +2,7 @@ package com.example.taskmanagementapplication;
 
 public class Task {
     private String id;
+    private int project_id;
     private String title;
     private String assigned_to;
     private String dueDate;
@@ -12,7 +13,6 @@ public class Task {
     public Task(String id, String title,String assigned_to, String dueDate,String priority, String status) {
         this.id = id;
         this.title = title;
-        this.assigned_to=assigned_to;
         this.assigned_to=assigned_to;
         this.priority=priority;
         this.dueDate = dueDate;
@@ -54,10 +54,14 @@ public class Task {
         this.title = title;
     }
 
+    public void setAssigned_to(String assigned_to) {
+        this.assigned_to = assigned_to;
+    }
+
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
-
+    public void setPriority(String priority){this.priority=priority;}
     public void setStatus(String status) {
         this.status = status;
     }
