@@ -4,12 +4,20 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,6 +68,8 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
     }
 
     //HERE WE PUT OUR CODE
+    RadioButton ascending_btn;
+    ListView tasks_listView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -71,12 +81,59 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
         //create an ArrayAdapter
         ArrayAdapter<CharSequence> my_adapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.spinner_items, android.R.layout.simple_spinner_item);
-        //This determines the appearance of the drop-down items in the Spinner
+        //This determines the appearance of the drop down menu items in the Spinner
         my_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //set my_adapter to the spinner
         my_spinner.setAdapter(my_adapter);
         //now adding item listener
         my_spinner.setOnItemSelectedListener(this);
+
+        //now find radio button
+        ascending_btn = rootView.findViewById(R.id.radioButton_ascending);
+        RadioButton descending_btn = rootView.findViewById(R.id.radioButton_descending);
+        //set ascending button checked as default
+        ascending_btn.setChecked(true);
+
+        //put the current username above
+        TextView username = rootView.findViewById(R.id.welcome_username2);
+        Home_Activity activity = (Home_Activity) getActivity();
+        String current_user = activity.getUsername();
+        username.setText("Welcome "+current_user);
+
+        //now i want to take sorting preferences before display tasks
+
+        //now set listview setting
+        tasks_listView = rootView.findViewById(R.id.tasks_listview);
+        //get all tasks for the user
+        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+        ArrayList<Task> project_tasks_array=myHelper.get_userTasks(current_user);
+        project_tasks_listAdapter tasksListAdapter=new project_tasks_listAdapter(this,
+                R.layout.project_tasks_list_adapter,
+                project_tasks_array);
+        tasks_listView.setAdapter(tasksListAdapter);
+        // Find the radio group
+        RadioGroup radioGroup = rootView.findViewById(R.id.my_radio_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // Get the sorting order based on the selected radio button
+                String sortingOrder;
+                if (ascending_btn.isChecked()) {
+                    sortingOrder = "ASC";
+                } else {
+                    sortingOrder = "DESC";
+                }
+                //get all tasks for the user
+                DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+                Home_Activity activity = (Home_Activity) getActivity();
+                String current_user = activity.getUsername();
+                ArrayList<Task> project_tasks_array=myHelper.sort_userTasks(current_user,sortingOrder);
+                project_tasks_listAdapter tasksListAdapter=new project_tasks_listAdapter(All_Tasks_Fragment.this,
+                        R.layout.project_tasks_list_adapter,
+                        project_tasks_array);
+                tasks_listView.setAdapter(tasksListAdapter);
+            }
+        });
 
 
         return rootView;
@@ -85,6 +142,7 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
     //Methods that must implements when using AdapterView.OnItemSelectedListener
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
 
     }
 

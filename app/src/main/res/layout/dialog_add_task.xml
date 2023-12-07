@@ -31,7 +31,7 @@
         android:layout_below="@id/task_title"
         android:layout_centerHorizontal="true"
         android:ems="10"
-        android:hint="Due Date MM/DD/YYYY"
+        android:hint="Due Date YYYY/MM/DD"
         android:inputType="datetime|date" />
 
     <LinearLayout

@@ -3,24 +3,26 @@ package com.example.taskmanagementapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import androidx.fragment.app.Fragment;
+
+import com.example.taskmanagementapplication.DatabaseHelper;
+import com.example.taskmanagementapplication.Project_Detail_Activity;
+import com.example.taskmanagementapplication.R;
+import com.example.taskmanagementapplication.Task;
 
 import java.util.ArrayList;
 
 public class project_tasks_listAdapter extends ArrayAdapter<Task> {
     private int resourceLayout;
     private Context mContext;
-    //we put it here so we can set a context to it in the constructor
     private DatabaseHelper my_helper;
-    //we will use this to use function called get_projectId()
-    private Project_Detail_Activity activity;
+    private Fragment fragment;
 
     public project_tasks_listAdapter(Context context, int resource, ArrayList<Task> items,
                                      Project_Detail_Activity activity) {
@@ -28,7 +30,14 @@ public class project_tasks_listAdapter extends ArrayAdapter<Task> {
         this.resourceLayout = resource;
         this.mContext = context;
         this.my_helper = new DatabaseHelper(context);
-        this.activity = activity;
+    }
+
+    public project_tasks_listAdapter(Fragment fragment, int resource, ArrayList<Task> items) {
+        super(fragment.requireContext(), resource, items);
+        this.resourceLayout = resource;
+        this.mContext = fragment.requireContext();
+        this.my_helper = new DatabaseHelper(mContext);
+        this.fragment = fragment;
     }
 
     @Override
@@ -43,20 +52,19 @@ public class project_tasks_listAdapter extends ArrayAdapter<Task> {
         Task tasks_item = getItem(position);
 
         if (tasks_item != null) {
-            TextView ID = (TextView) my_view.findViewById(R.id.task_id);
-            TextView title = (TextView) my_view.findViewById(R.id.task_title);
-            TextView assignedTo = (TextView) my_view.findViewById(R.id.task_assignTo);
-            TextView due_date = (TextView) my_view.findViewById(R.id.task_due_date);
-            TextView priority = (TextView) my_view.findViewById(R.id.task_priority);
-            TextView status = (TextView) my_view.findViewById(R.id.task_status);
+            TextView ID = my_view.findViewById(R.id.task_id);
+            TextView title = my_view.findViewById(R.id.task_title);
+            TextView assignedTo = my_view.findViewById(R.id.task_assignTo);
+            TextView due_date = my_view.findViewById(R.id.task_due_date);
+            TextView priority = my_view.findViewById(R.id.task_priority);
+            TextView status = my_view.findViewById(R.id.task_status);
 
-            //set texts
-            ID.setText("Task ID : "+tasks_item.getId());
-            title.setText("Title : " + tasks_item.getTitle());
-            assignedTo.setText("Assigned To :"+tasks_item.getAssigned_to());
-            due_date.setText("Due date : " + tasks_item.getDueDate());
-            priority.setText("Priority :" + tasks_item.getPriority());
-            status.setText("Status : " + tasks_item.getStatus());
+            ID.setText("Task ID: " + tasks_item.getId());
+            title.setText("Title: " + tasks_item.getTitle());
+            assignedTo.setText("Assigned To: " + tasks_item.getAssigned_to());
+            due_date.setText("Due date: " + tasks_item.getDueDate());
+            priority.setText("Priority: " + tasks_item.getPriority());
+            status.setText("Status: " + tasks_item.getStatus());
         }
         return my_view;
     }

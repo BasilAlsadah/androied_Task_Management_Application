@@ -272,6 +272,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return rowsAffected > 0;
     }
+    //---------------retrieve all user task
+    public ArrayList<Task> get_userTasks(String current_user){
+        ArrayList<Task> tasks_list = new ArrayList<>();
+        db=this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT ID,username,title,due_date,priority,status FROM Tasks " +
+                "WHERE username=?",new String[]{String.valueOf(current_user)});
+        if (cursor.moveToFirst()){
+            do {
+                String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
+                String get_task_dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
+                String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+                // Create a new Task object and add it to the list
+                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
+                tasks_list.add(task);
+            } while (cursor.moveToNext());
+        }
+        return  tasks_list;
+    }
+    //---------------Task sorting method
+    public ArrayList<Task> sort_userTasks(String current_user, String sortingOrder) {
+        ArrayList<Task> tasks_list = new ArrayList<>();
+        db = this.getReadableDatabase();
+
+        String query = "SELECT ID, username, title, due_date, priority, status FROM Tasks " +
+                "WHERE username=? ORDER BY due_date " + sortingOrder;
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(current_user)});
+        if (cursor.moveToFirst()) {
+            do {
+                // Retrieve task details from the cursor
+                String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
+                String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
+                String get_task_dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
+                String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
+
+                // Create a new Task object and add it to the list
+                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate, get_priority, get_task_status);
+                tasks_list.add(task);
+            } while (cursor.moveToNext());
+        }
+
+        return tasks_list;
+    }
+
 
     //---------------Create project_members Table
     //here will be project_members table methods by basil
