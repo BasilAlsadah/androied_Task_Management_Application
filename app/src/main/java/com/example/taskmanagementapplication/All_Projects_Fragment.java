@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SearchView;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,7 +32,7 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    ArrayList<String> own=new ArrayList<String>();
+    ArrayList<String> own = new ArrayList<String>();
 
     public All_Projects_Fragment() {
         // Required empty public constructor
@@ -64,8 +64,10 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
     //Here will start our code
-    List<Pair<Integer, Pair<String, String>>> projectsList;
+    SearchView my_searchBar;
+    ArrayList<Project> projectsList;
     DatabaseHelper myHelper = new DatabaseHelper(getActivity());
     project_listAdapter adapter;
     @Override
@@ -79,27 +81,16 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
         TextView username = rootView.findViewById(R.id.welcome_username);
         Home_Activity activity = (Home_Activity) getActivity();
         String current_user = activity.getUsername();
-        username.setText("Welcome "+current_user);
+        username.setText("Welcome " + current_user);
         DatabaseHelper my_helper = new DatabaseHelper(getActivity());
 
-        own.add("item1");own.add("bro");own.add("Sekiro");
-        //find project list
-        /*
-        ListView projects_listview = rootView.findViewById(R.id.projects_list);
-        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-        ArrayList<String> All_projectList = myHelper.getAll_projects();
-        ArrayAdapter<String> myAdapter = new ArrayAdapter<>(rootView.getContext(),
-                android.R.layout.simple_expandable_list_item_2,All_projectList);
-        projects_listview.setAdapter(myAdapter);
-
-
-         */
-        //new VERSION
+        //check if project table if exist
         boolean is_exist = my_helper.isTableExists("projects");
-        if(is_exist) {
+        if (is_exist) {
+            //fill the listView with user projects
             ListView projects_listview = rootView.findViewById(R.id.projects_list);
             DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-            List<Pair<Integer, Pair<String, String>>> projectsList = myHelper.getAllProjects(current_user);
+            projectsList = myHelper.getAllProjects(current_user);
             adapter = new project_listAdapter(getActivity(), projectsList);
             projects_listview.setAdapter(adapter);
 
@@ -108,9 +99,9 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     // Get the ID and name of the clicked project
-                    Pair<Integer, Pair<String, String>> clickedProject = projectsList.get(position);
-                    int projectId = clickedProject.first;
-                    String projectName = clickedProject.second.first;
+                    Project clickedProject = projectsList.get(position);
+                    int projectId = clickedProject.getId();
+                    String projectName = clickedProject.getName();
                     //create intent
                     Intent my_intent = new Intent(getActivity(), Project_Detail_Activity.class);
                     //put extra
@@ -121,13 +112,30 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
                     startActivity(my_intent);
                 }
             });
-        }else{
+        } else {
 
         }
-        //create on click listener for create project button
-        create_project_btn.setOnClickListener(new View.OnClickListener(){
+        //find the searchBar
+        my_searchBar = rootView.findViewById(R.id.search_bar);
+        my_searchBar.setEnabled(true);
+        //add a query text listener
+        my_searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View view){
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterList(newText);
+
+                return false;
+            }
+        });
+        //create on click listener for create project button
+        create_project_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 //create dialog
                 openMydialofg();
 
@@ -138,28 +146,53 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
 
         return rootView;
     }
+
     @Override
     public void onDialogDismiss() {
-            Home_Activity activity = (Home_Activity) getActivity();
-            String current_user = activity.getUsername();
-            //When the dialog dismissed we will update the listView
-            DatabaseHelper myHelper = new DatabaseHelper(getActivity());
-            //get all projects
-            List<Pair<Integer, Pair<String, String>>> updatedProjectsList = myHelper.getAllProjects(current_user);
+        Home_Activity activity = (Home_Activity) getActivity();
+        String current_user = activity.getUsername();
+        //When the dialog dismissed we will update the listView
+        DatabaseHelper myHelper = new DatabaseHelper(getActivity());
+        //get all projects
+        ArrayList<Project> updatedProjectsList = myHelper.getAllProjects(current_user);
 
-            // Update the adapter with the new data
-            adapter.clear();
-            adapter.addAll(updatedProjectsList);
+        // Update the adapter with the new data
+        adapter.clear();
+        adapter.addAll(updatedProjectsList);
 
-            // Notify the adapter that the data has changed
-            adapter.notifyDataSetChanged();
+        // Notify the adapter that the data has changed
+        adapter.notifyDataSetChanged();
 
     }
 
-    public void openMydialofg(){
-        myDialog mydialog=new myDialog();
+    public void openMydialofg() {
+        myDialog mydialog = new myDialog();
         mydialog.setOnDismissListener((myDialog.OnDismissListener) this);
         mydialog.show(getActivity().getSupportFragmentManager(), "Create project page");
     }
 
-}
+    //a method for search bar
+    public void filterList(String text) {
+        ArrayList<Project> filteredList = new ArrayList<>();
+        for (Project project : projectsList) {
+            if (project.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(project);//filterList cs 526 and cs 517
+            }
+        }
+
+        if (adapter != null) {
+            if (text.isEmpty()) {
+                adapter.clear();
+                adapter.addAll(projectsList);
+            } else {
+                adapter.clear();
+                adapter.addAll(filteredList);// cs 526 and cs 517 printed
+            }
+            //adapter.setFilteredList(filteredList);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+
+
+    }

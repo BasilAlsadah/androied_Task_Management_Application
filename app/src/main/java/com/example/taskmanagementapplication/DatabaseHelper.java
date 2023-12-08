@@ -146,6 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //---------------Retrieve all projects for a user *BROKEN*
 
     //Another version
+    /*
     public List<Pair<Integer, Pair<String, String>>> getAllProjects(String current_username) {
         List<Pair<Integer, Pair<String, String>>> projectsList = new ArrayList<>();
         db = this.getReadableDatabase();
@@ -159,6 +160,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
                 Pair<String, String> project = new Pair<>(projectName, projectDesc);
                 projectsList.add(new Pair<>(projectId, project));
+            } while (myCursor.moveToNext());
+        }
+        myCursor.close();
+        return projectsList;
+    }
+
+     */
+    //Another version with project class
+    public ArrayList<Project> getAllProjects(String current_username) {
+        ArrayList<Project> projectsList = new ArrayList<>();
+        db = this.getReadableDatabase();
+        Cursor myCursor = db.rawQuery("SELECT projects.* FROM projects JOIN Members ON "
+                + "projects.ID=Members.project_id "
+                + "WHERE Members.username= ?", new String[]{current_username});
+        if (myCursor.moveToFirst()) {
+            do {
+                int projectId = myCursor.getInt(myCursor.getColumnIndexOrThrow("ID"));
+                String projectName = myCursor.getString(myCursor.getColumnIndexOrThrow("name"));
+                String projectDesc = myCursor.getString(myCursor.getColumnIndexOrThrow("description"));
+                String projectAdmin = myCursor.getString(myCursor.getColumnIndexOrThrow("admin"));
+                Project new_project= new Project(projectId,projectName,projectDesc,projectAdmin);
+                projectsList.add(new_project);
             } while (myCursor.moveToNext());
         }
         myCursor.close();
