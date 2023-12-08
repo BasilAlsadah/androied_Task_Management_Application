@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/task_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task ID"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/project_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Project name"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/task_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task title"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/task_assignTo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="assigned to"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/task_due_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="due Date"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/task_priority"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="priority"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/task_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="status"
+        android:textSize="16sp" />
+
+</LinearLayout>

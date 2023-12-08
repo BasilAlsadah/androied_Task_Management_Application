@@ -2,7 +2,7 @@ package com.example.taskmanagementapplication;
 
 public class Task {
     private String id;
-    private int project_id;
+    private String project_id;
     private String title;
     private String assigned_to;
     private String dueDate;
@@ -10,8 +10,9 @@ public class Task {
     private String status;
 
     // Constructor
-    public Task(String id, String title,String assigned_to, String dueDate,String priority, String status) {
+    public Task(String id,String project_id, String title,String assigned_to, String dueDate,String priority, String status) {
         this.id = id;
+        this.project_id=project_id;
         this.title = title;
         this.assigned_to=assigned_to;
         this.priority=priority;
@@ -30,7 +31,7 @@ public class Task {
     public String getId() {
         return id;
     }
-
+    public String getProject_id(){ return project_id;}
     public String getTitle() {
         return title;
     }

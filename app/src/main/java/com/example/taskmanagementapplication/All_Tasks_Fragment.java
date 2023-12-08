@@ -91,8 +91,6 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
         //now find radio button
         ascending_btn = rootView.findViewById(R.id.radioButton_ascending);
         RadioButton descending_btn = rootView.findViewById(R.id.radioButton_descending);
-        //set ascending button checked as default
-        ascending_btn.setChecked(true);
 
         //put the current username above
         TextView username = rootView.findViewById(R.id.welcome_username2);
@@ -100,15 +98,14 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
         String current_user = activity.getUsername();
         username.setText("Welcome "+current_user);
 
-        //now i want to take sorting preferences before display tasks
 
         //now set listview setting
         tasks_listView = rootView.findViewById(R.id.tasks_listview);
-        //get all tasks for the user
+        //get all tasks for the user without sorting
         DatabaseHelper myHelper = new DatabaseHelper(getActivity());
         ArrayList<Task> project_tasks_array=myHelper.get_userTasks(current_user);
-        project_tasks_listAdapter tasksListAdapter=new project_tasks_listAdapter(this,
-                R.layout.project_tasks_list_adapter,
+        sorted_task_listAdapter tasksListAdapter=new sorted_task_listAdapter(this,
+                R.layout.task_sorted_list_adapter,
                 project_tasks_array);
         tasks_listView.setAdapter(tasksListAdapter);
         // Find the radio group
@@ -128,8 +125,8 @@ public class All_Tasks_Fragment extends Fragment implements AdapterView.OnItemSe
                 Home_Activity activity = (Home_Activity) getActivity();
                 String current_user = activity.getUsername();
                 ArrayList<Task> project_tasks_array=myHelper.sort_userTasks(current_user,sortingOrder);
-                project_tasks_listAdapter tasksListAdapter=new project_tasks_listAdapter(All_Tasks_Fragment.this,
-                        R.layout.project_tasks_list_adapter,
+                sorted_task_listAdapter tasksListAdapter=new sorted_task_listAdapter(All_Tasks_Fragment.this,
+                        R.layout.task_sorted_list_adapter,
                         project_tasks_array);
                 tasks_listView.setAdapter(tasksListAdapter);
             }

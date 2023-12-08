@@ -244,13 +244,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()){
             do {
                 String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_project_id=String.valueOf(project_id);
                 String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
                 String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
                 String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
                 String get_task_dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
                 String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
                 // Create a new Task object and add it to the list
-                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
+                Task task = new Task(get_task_id,get_project_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
                 tasks_list.add(task);
             } while (cursor.moveToNext());
         }
@@ -276,18 +277,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Task> get_userTasks(String current_user){
         ArrayList<Task> tasks_list = new ArrayList<>();
         db=this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT ID,username,title,due_date,priority,status FROM Tasks " +
+        Cursor cursor = db.rawQuery("SELECT ID,project_id,username,title,due_date,priority,status FROM Tasks " +
                 "WHERE username=?",new String[]{String.valueOf(current_user)});
         if (cursor.moveToFirst()){
             do {
                 String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_project_id=cursor.getString(cursor.getColumnIndexOrThrow("project_id"));
                 String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
                 String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
                 String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
                 String get_task_dueDate = cursor.getString(cursor.getColumnIndexOrThrow("due_date"));
                 String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
                 // Create a new Task object and add it to the list
-                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
+                Task task = new Task(get_task_id,get_project_id, get_task_title, get_task_assignTo, get_task_dueDate,get_priority, get_task_status);
                 tasks_list.add(task);
             } while (cursor.moveToNext());
         }
@@ -298,7 +300,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Task> tasks_list = new ArrayList<>();
         db = this.getReadableDatabase();
 
-        String query = "SELECT ID, username, title, due_date, priority, status FROM Tasks " +
+        String query = "SELECT ID,project_id, username, title, due_date, priority, status FROM Tasks " +
                 "WHERE username=? ORDER BY due_date " + sortingOrder;
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(current_user)});
@@ -306,6 +308,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 // Retrieve task details from the cursor
                 String get_task_id = cursor.getString(cursor.getColumnIndexOrThrow("ID"));
+                String get_project_id=cursor.getString(cursor.getColumnIndexOrThrow("project_id"));
                 String get_task_title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
                 String get_task_assignTo = cursor.getString(cursor.getColumnIndexOrThrow("username"));
                 String get_priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
@@ -313,14 +316,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String get_task_status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
 
                 // Create a new Task object and add it to the list
-                Task task = new Task(get_task_id, get_task_title, get_task_assignTo, get_task_dueDate, get_priority, get_task_status);
+                Task task = new Task(get_task_id,get_project_id, get_task_title, get_task_assignTo, get_task_dueDate, get_priority, get_task_status);
                 tasks_list.add(task);
             } while (cursor.moveToNext());
         }
 
         return tasks_list;
     }
-
+    //---------------Getting project name by it's id
+    public String getProjectName(String proj_id){
+        String proj_name = new String();
+        db=this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT name FROM projects WHERE ID=?",
+                new String[]{String.valueOf(proj_id)});
+        if (cursor.moveToFirst()){
+            do{
+                proj_name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            }while(cursor.moveToNext());
+        }
+        return proj_name;
+    }
 
     //---------------Create project_members Table
     //here will be project_members table methods by basil

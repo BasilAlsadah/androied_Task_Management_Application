@@ -124,7 +124,7 @@ public class All_Projects_Fragment extends Fragment implements myDialog.OnDismis
         }else{
 
         }
-        //create on click listener
+        //create on click listener for create project button
         create_project_btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
